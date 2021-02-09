@@ -1,0 +1,77 @@
+---
+title: "PowerCurve"
+author: "Zijie Huang"
+date: "2021/2/10"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load("tidyverse","knitr")
+```
+
+```{r}
+#function of alpha and beta
+alpha <- function(m,n,p){
+  tmp <- 0
+  for (i in m:n) {
+    tmp <- tmp + dbinom(i,n,p)
+  }
+  return(tmp)
+}
+
+beta <- function(m,n,p){
+  tmp <- 0
+  for (i in m:n) {
+    tmp <- tmp + dbinom(i,n,p)
+  }
+  return(1-tmp)
+}
+```
+
+```{r}
+#calculate critical points
+n <- 100
+p1 <- 0.6
+p2 <- 0.8
+type1 <- rep(0,100)
+type2 <- rep(0,100)
+
+for (i in 1:100) {
+  type1[i] <- alpha(i,n,p1)
+}
+m1 <- min(which(type1<0.05))
+
+for (i in 1:100) {
+  type2[i] <- beta(i,n,p2)
+}
+m2 <- max(which(type2<0.05))
+
+cat("Smallest m to let type-I error < 0.05:",m1,
+    "\nLargest m to let type-II error < 0.05:",m2)
+```
+
+```{r}
+#plot
+AlphaCurve1 <- function(x){
+  sum(dbinom(69:100,100,x))
+}
+
+AlphaCurve2 <- function(x){
+  sum(dbinom(73:100,100,x))
+}
+
+AlphaCurve1<-Vectorize(AlphaCurve1)
+AlphaCurve2<-Vectorize(AlphaCurve2)
+
+ggplot(data.frame(x=c(0.4,1)), aes(x=x)) + 
+  stat_function(fun=AlphaCurve1)+
+  stat_function(fun=AlphaCurve2)+
+  geom_rect(aes(xmin = 0.6, xmax = 0.8, ymin = 0.05, ymax = 0.95),
+               fill = "transparent", color = "grey", size = 0.5)+
+  scale_x_continuous(breaks = seq(0.4,1,0.1), minor_breaks = NULL)+
+  scale_y_continuous(breaks = seq(0,1,0.1), minor_breaks = NULL)+
+  theme_classic()+
+  theme(axis.title.x=element_blank(),
+        axis.title.y=element_blank(),)
+```
