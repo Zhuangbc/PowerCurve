@@ -2,13 +2,22 @@
 title: "PowerCurve"
 author: "Zijie Huang"
 date: "2021/2/10"
-output: pdf_document
+output: 
+  pdf_document: 
+    latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load("tidyverse","knitr")
 ```
+
+### Build Function
+We first build the functions of $\alpha$ and $\beta$.
+\begin{align*}
+& \alpha(p)=\sum_{m\leq k\leq n}b(n,p,k)\\
+& \beta(p)=1-\sum_{m\leq k\leq n}b(n,p,k)
+\end{align*}
 
 ```{r}
 #function of alpha and beta
@@ -28,6 +37,16 @@ beta <- function(m,n,p){
   return(1-tmp)
 }
 ```
+
+### Find Critical Value
+\begin{align*}
+& \alpha(0.6)=\sum_{m\leq k\leq 100}b(100,0.6,k) <0.05\\
+\Longrightarrow {} & m>69\\
+\end{align*}
+\begin{align*}
+& \beta(0.8)=1-\sum_{m\leq k\leq 100}b(100,0.8,k) <0.05\\
+\Longrightarrow {} & m<73\\
+\end{align*}
 
 ```{r}
 #calculate critical points
@@ -51,6 +70,8 @@ cat("Smallest m to let type-I error < 0.05:",m1,
     "\nLargest m to let type-II error < 0.05:",m2)
 ```
 
+### Plor Curve
+The left curve is using $m=69$ and the right curve is using $m=73$ which are the two critical values we get in the previous section. Since we require the type-I error and the type-II error to be smaller than 0.05, the value of these two curves should lie between $0.05$ and $1-0.05$ for a given range of $p$. Then, what is this range or value? For type-I error, we choose $p=0.6$. For type-II error, we choose $p=0.8$. Therefore, the range should be betweeen $0.6$ and $0.8$.
 ```{r}
 #plot
 AlphaCurve1 <- function(x){
@@ -73,5 +94,5 @@ ggplot(data.frame(x=c(0.4,1)), aes(x=x)) +
   scale_y_continuous(breaks = seq(0,1,0.1), minor_breaks = NULL)+
   theme_classic()+
   theme(axis.title.x=element_blank(),
-        axis.title.y=element_blank(),)
+        axis.title.y=element_blank())
 ```
